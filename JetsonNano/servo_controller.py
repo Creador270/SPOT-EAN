@@ -117,11 +117,13 @@ class Controllers:
         return self._val_list
 
     def servoRotate(self, thetas):
+        
         self.angleToServo(thetas)
         #self.angleToServo(np.zeros((4,3)))
         for x in range(len(self._val_list)):
             
             if x>=0 and x<15:
+                logging.info("Servo: " + str(x) + " Angle: " + str(self._val_list[x]))
                 self._val_list[x] = (self._val_list[x]-26.36)*(1980/1500)
                 #logging.info(self._val_list[x], end=' ')
                 #if x%3 == 2: logging.info()
@@ -172,7 +174,7 @@ if __name__=="__main__":
                            [-100,-100,87.5,1],
                            [-100,-100,-87.5,1]])
     thetas = initIK(legEndpoints) #radians
-    
+    print(f"Thetas: {thetas}")
     controller = Controllers()
 
     # Get radian thetas, transform to integer servo angles
@@ -184,4 +186,5 @@ if __name__=="__main__":
     logging.info(svAngle)
 
     # #plot at the end
-    plotKinematics()
+    # plotKinematics()
+    
