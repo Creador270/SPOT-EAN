@@ -1,0 +1,761 @@
+<sdf version='1.7'>
+  <model name='SpotMicroAI'>
+    <link name='base_link'>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>3.2</mass>
+        <inertia>
+          <ixx>300</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>300</iyy>
+          <iyz>0</iyz>
+          <izz>300</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.2 0.11 0.07</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__front_link_collision_1'>
+        <pose>-0.145 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.058 0.11 0.07</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__rear_link_collision_2'>
+        <pose>0.135 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.057 0.11 0.07</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>-0.135 0.055 -0.032 0 0 -1.5707</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/Base.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_fixed_joint_lump__front_link_visual_1'>
+        <pose>-0.185 0.065 -0.033 0 0 -1.5707</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/top.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_fixed_joint_lump__rear_link_visual_2'>
+        <pose>-0.105 0.055 -0.034 0 0 -1.5707</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/bottom.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_left_shoulder' type='revolute'>
+      <pose relative_to='base_link'>-0.104 -0.038 0 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>front_left_shoulder_link</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.548</lower>
+          <upper>0.548</upper>
+          <effort>1000</effort>
+          <velocity>0.7</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0.5</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_left_shoulder_link'>
+      <pose relative_to='front_left_shoulder'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>100</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>100</iyy>
+          <iyz>0</iyz>
+          <izz>100</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_left_shoulder_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.044 0.038 0.07</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='front_left_shoulder_link_visual'>
+        <pose>0.028 -0.03 -0.029 1.57089 -7e-06 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/left_fordward_right_backward_shoulder.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_left_leg' type='revolute'>
+      <pose relative_to='front_left_shoulder_link'>0 -0.052 0 0 -0 0</pose>
+      <parent>front_left_shoulder_link</parent>
+      <child>front_left_leg_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-2.666</lower>
+          <upper>1.548</upper>
+          <effort>1000</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_left_leg_link'>
+      <pose relative_to='front_left_leg'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>1000</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1000</iyy>
+          <iyz>0</iyz>
+          <izz>1000</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_left_leg_link_collision'>
+        <pose>0 0 -0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.028 0.036 0.12</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='front_left_leg_link_visual'>
+        <pose>-0.02 0.025 -0.132 7e-06 -1.34159 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/left_arm.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_left_foot' type='revolute'>
+      <pose relative_to='front_left_leg_link'>-0.01 0 -0.12 0 -0 0</pose>
+      <parent>front_left_leg_link</parent>
+      <child>front_left_foot_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.1</lower>
+          <upper>2.59</upper>
+          <effort>1000</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0.5</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_left_foot_link'>
+      <pose relative_to='front_left_foot'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 -0.038333 0 -0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>2000</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2000</iyy>
+          <iyz>0</iyz>
+          <izz>2000</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_left_foot_link_collision'>
+        <pose>0 0 -0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.026 0.02 0.115</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='front_left_foot_link_fixed_joint_lump__front_left_toe_link_collision_1'>
+        <pose>0 0 -0.115 0 -0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.02</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name='front_left_foot_link_visual'>
+        <pose>0.023 0.018 -0.133 1.5708 -1.5708 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/left_wrist.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='front_left_foot_link_fixed_joint_lump__front_left_toe_link_visual_1'>
+        <pose>0 0 -0.115 3.14159 0.791593 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/Foot_Tip.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_right_shoulder' type='revolute'>
+      <pose relative_to='base_link'>-0.104 0.038 0 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>front_right_shoulder_link</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.548</lower>
+          <upper>0.548</upper>
+          <effort>1000</effort>
+          <velocity>0.7</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0.5</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_right_shoulder_link'>
+      <pose relative_to='front_right_shoulder'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>100</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>100</iyy>
+          <iyz>0</iyz>
+          <izz>100</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_right_shoulder_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.044 0.038 0.07</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='front_right_shoulder_link_visual'>
+        <pose>-0.028 0.03 -0.027 1.5707 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/right_fordward_left_backward_shoulder.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_right_leg' type='revolute'>
+      <pose relative_to='front_right_shoulder_link'>0 0.052 0 0 -0 0</pose>
+      <parent>front_right_shoulder_link</parent>
+      <child>front_right_leg_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-2.666</lower>
+          <upper>1.548</upper>
+          <effort>1000</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_right_leg_link'>
+      <pose relative_to='front_right_leg'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>1000</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1000</iyy>
+          <iyz>0</iyz>
+          <izz>1000</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_right_leg_link_collision'>
+        <pose>0 0 -0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.028 0.036 0.12</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='front_right_leg_link_visual'>
+        <pose>-0.02 0.039 -0.132 7e-06 -1.34159 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/right_arm.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_right_foot' type='revolute'>
+      <pose relative_to='front_right_leg_link'>-0.01 0 -0.12 0 -0 0</pose>
+      <parent>front_right_leg_link</parent>
+      <child>front_right_foot_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.1</lower>
+          <upper>2.59</upper>
+          <effort>1000</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0.5</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_right_foot_link'>
+      <pose relative_to='front_right_foot'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 -0.038333 0 -0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>2000</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2000</iyy>
+          <iyz>0</iyz>
+          <izz>2000</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_right_foot_link_collision'>
+        <pose>0 0 -0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.026 0.02 0.115</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='front_right_foot_link_fixed_joint_lump__front_right_toe_link_collision_1'>
+        <pose>0 0 -0.115 0 -0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.02</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name='front_right_foot_link_visual'>
+        <pose>-0.013 -0.018 -0.133 -1.5708 -1.5708 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/right_wrist.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='front_right_foot_link_fixed_joint_lump__front_right_toe_link_visual_1'>
+        <pose>0 0 -0.115 3.14159 0.791593 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/Foot_Tip.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_left_shoulder' type='revolute'>
+      <pose relative_to='base_link'>0.104 -0.038 0 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>rear_left_shoulder_link</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.548</lower>
+          <upper>0.548</upper>
+          <effort>1000</effort>
+          <velocity>0.7</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0.5</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_left_shoulder_link'>
+      <pose relative_to='rear_left_shoulder'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>100</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>100</iyy>
+          <iyz>0</iyz>
+          <izz>100</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_left_shoulder_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.044 0.038 0.07</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='rear_left_shoulder_link_visual'>
+        <pose>0.028 -0.03 -0.029 1.57089 -7e-06 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/left_fordward_right_backward_shoulder.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_left_leg' type='revolute'>
+      <pose relative_to='rear_left_shoulder_link'>0 -0.052 0 0 -0 0</pose>
+      <parent>rear_left_shoulder_link</parent>
+      <child>rear_left_leg_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-2.666</lower>
+          <upper>1.548</upper>
+          <effort>1000</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_left_leg_link'>
+      <pose relative_to='rear_left_leg'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>1000</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1000</iyy>
+          <iyz>0</iyz>
+          <izz>1000</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_left_leg_link_collision'>
+        <pose>0 0 -0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.028 0.036 0.12</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='rear_left_leg_link_visual'>
+        <pose>-0.02 0.025 -0.132 7e-06 -1.34159 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/left_arm.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_left_foot' type='revolute'>
+      <pose relative_to='rear_left_leg_link'>-0.01 0 -0.12 0 -0 0</pose>
+      <parent>rear_left_leg_link</parent>
+      <child>rear_left_foot_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.1</lower>
+          <upper>2.59</upper>
+          <effort>1000</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0.5</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_left_foot_link'>
+      <pose relative_to='rear_left_foot'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 -0.038333 0 -0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>2000</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2000</iyy>
+          <iyz>0</iyz>
+          <izz>2000</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_left_foot_link_collision'>
+        <pose>0 0 -0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.026 0.02 0.115</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='rear_left_foot_link_fixed_joint_lump__rear_left_toe_link_collision_1'>
+        <pose>0 0 -0.115 0 -0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.02</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name='rear_left_foot_link_visual'>
+        <pose>0.023 0.018 -0.133 1.5708 -1.5708 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/left_wrist.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='rear_left_foot_link_fixed_joint_lump__rear_left_toe_link_visual_1'>
+        <pose>0 0 -0.115 3.14159 0.791593 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/Foot_Tip.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_right_shoulder' type='revolute'>
+      <pose relative_to='base_link'>0.104 0.038 0 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>rear_right_shoulder_link</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-0.548</lower>
+          <upper>0.548</upper>
+          <effort>1000</effort>
+          <velocity>0.7</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0.5</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_right_shoulder_link'>
+      <pose relative_to='rear_right_shoulder'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>100</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>100</iyy>
+          <iyz>0</iyz>
+          <izz>100</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_right_shoulder_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.044 0.038 0.07</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='rear_right_shoulder_link_visual'>
+        <pose>-0.028 0.03 -0.027 1.5707 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/right_fordward_left_backward_shoulder.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_right_leg' type='revolute'>
+      <pose relative_to='rear_right_shoulder_link'>0 0.052 0 0 -0 0</pose>
+      <parent>rear_right_shoulder_link</parent>
+      <child>rear_right_leg_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-2.666</lower>
+          <upper>1.548</upper>
+          <effort>1000</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_right_leg_link'>
+      <pose relative_to='rear_right_leg'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>1000</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1000</iyy>
+          <iyz>0</iyz>
+          <izz>1000</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_right_leg_link_collision'>
+        <pose>0 0 -0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.028 0.036 0.12</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='rear_right_leg_link_visual'>
+        <pose>-0.02 0.039 -0.132 7e-06 -1.34159 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/right_arm.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='rear_right_foot' type='revolute'>
+      <pose relative_to='rear_right_leg_link'>-0.01 0 -0.12 0 -0 0</pose>
+      <parent>rear_right_leg_link</parent>
+      <child>rear_right_foot_link</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.1</lower>
+          <upper>2.59</upper>
+          <effort>1000</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0.5</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_right_foot_link'>
+      <pose relative_to='rear_right_foot'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 -0.038333 0 -0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>2000</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2000</iyy>
+          <iyz>0</iyz>
+          <izz>2000</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_right_foot_link_collision'>
+        <pose>0 0 -0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.026 0.02 0.115</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='rear_right_foot_link_fixed_joint_lump__rear_right_toe_link_collision_1'>
+        <pose>0 0 -0.115 0 -0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.02</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name='rear_right_foot_link_visual'>
+        <pose>-0.013 -0.018 -0.133 -1.5708 -1.5708 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/right_wrist.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='rear_right_foot_link_fixed_joint_lump__rear_right_toe_link_visual_1'>
+        <pose>0 0 -0.115 3.14159 0.791593 3.14159</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://old_spot_files/meshes/stl_ean/STL/Foot_Tip.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
