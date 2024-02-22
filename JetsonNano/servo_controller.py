@@ -62,24 +62,25 @@ class Controllers:
         self.kit = ServoKit(channels=16, i2c=i2c_bus0)
 
         # centered position perpendicular to the ground
-        # self._servo_offsets = [90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90]
         #default positions to go back to
         self._servo_offsets = {
-            0: 110,  # front_left DOWN
-            1: 100,  # front_left MID
+            0: 170,  # front_left DOWN
+            1: 60,  # front_left MID
             2: 60,   # front_left UP
-            4: 70,   # front_right DOWN
-            5: 110,  # front_right MID
+            4: 10,   # front_right DOWN
+            5: 150,  # front_right MID
             6: 150,  # front_right UP
-            8: 110,  # back_left DOWN
-            9: 100,  # back_left MID
-            10: 130, # back_left UP
-            12: 70,  # back_right DOWN
-            13: 110, # back_right MID
-            14: 60   # back_right UP
+            8: 170,  # back_left DOWN
+            9: 60,  # back_left MID
+            10: 140, # back_left UP
+            12: 10,  # back_right DOWN
+            13: 145, # back_right MID
+            14: 70   # back_right UP
         }
+        
+        # self._servo_offsets = {k: 90 for k in range(16)}
 
-        self._val_list = np.zeros(12) #[ x for x in range(12) ]
+        self._val_list = np.zeros(16) #[ x for x in range(12) ]
 
         # All Angles for Leg 3 * 4 = 12 length
         self._thetas = []
@@ -111,7 +112,8 @@ class Controllers:
         ]
 
         for i, (servo, joint, direction) in enumerate(mapping):
-            self._val_list[i] = self._servo_offsets[servo] + direction * self._thetas[i // 3][joint]
+            self._val_list[servo] = self._servo_offsets[servo] + direction * self._thetas[i // 3][joint]
+            # self._val_list[servo] = self._thetas[i // 3][joint]
             
     def getServoAngles(self):
         return self._val_list
@@ -124,9 +126,7 @@ class Controllers:
             
             if x>=0 and x<15:
                 logging.info("Servo: " + str(x) + " Angle: " + str(self._val_list[x]))
-                self._val_list[x] = (self._val_list[x]-26.36)*(1980/1500)
-                #logging.info(self._val_list[x], end=' ')
-                #if x%3 == 2: logging.info()
+                self._val_list[x] = (self._val_list[x])
                 logging.info(self._val_list[x])
 
                 if (self._val_list[x] > 180):
@@ -137,7 +137,7 @@ class Controllers:
                     logging.info("Under 0!!")
                     self._val_list[x] = 1
                     continue
-                self.kit.servo[x].angle = self._val_list[x]
+                # self.kit.servo[x].angle = self._val_list[x]
 
 
 if __name__=="__main__":
@@ -168,23 +168,30 @@ if __name__=="__main__":
     that is 100 units in front of the robot, 100 units to the left of the robot, 
     and 87.5 units above the robot._
     
+    So, based on this code, the order of the legs in the inverse kinematics matrix is:
+
+        Front left
+        Front right
+        Back left
+        Back right
+            
     """
     legEndpoints=np.array([[100,-100,87.5,1],
                            [100,-100,-87.5,1],
                            [-100,-100,87.5,1],
                            [-100,-100,-87.5,1]])
     thetas = initIK(legEndpoints) #radians
-    print(f"Thetas: {thetas}")
-    controller = Controllers()
 
+    controller = Controllers()
+    
     # Get radian thetas, transform to integer servo angles
     # then, rotate servos
     controller.servoRotate(thetas)
-
+    logging.info(f"Thetas: {controller._thetas}")
     # Get AngleValues for Debugging
     svAngle = controller.getServoAngles()
     logging.info(svAngle)
 
     # #plot at the end
-    # plotKinematics()
+    plotKinematics()
     

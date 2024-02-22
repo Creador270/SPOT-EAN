@@ -65,6 +65,17 @@ class Kinematic:
                 Tm.dot(np.array([[cHp,0,sHp,-L/2],[0,1,0,0],[-sHp,0,cHp,-W/2],[0,0,0,1]]))])
 
     def legIK(self,point):
+        """_
+        
+        So, the order of the thetas is:
+
+        Upper joint (hip)
+        Middle joint (knee)
+        Lower joint (ankle)_
+
+        Args:
+            point (_type_): _description_
+        """
         (x,y,z)=(point[0],point[1],point[2])
         (l1,l2,l3,l4)=(self.l1,self.l2,self.l3,self.l4)
         try:        
@@ -161,6 +172,30 @@ class Kinematic:
         self.drawLegPoints([Trb.dot(Ix.dot(x)) for x in self.calcLegPoints(tuple(La[3]))])
 
     def calcIK(self,Lp,angles,center):
+        """_
+        
+        The leg arrangement in the inverse kinematics matrix is determined by the calcIK method in the Kinematic class. 
+        This method calculates the inverse kinematics for each leg and returns them in a specific order.
+
+        Here's the relevant part of the calcIK method:
+
+        The order of the legs in the returned array is determined by the order of these lines. 
+        The first line corresponds to the first leg, the second line corresponds to the second leg, and so on.
+
+        Front left
+        Front right
+        Back left
+        Back right
+        _
+
+        Args:
+            Lp (_type_): _description_
+            angles (_type_): _description_
+            center (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         (omega,phi,psi)=angles
         (xm,ym,zm)=center
         
