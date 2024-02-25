@@ -116,17 +116,15 @@ def main(id, command_status):
 
         # Get current Angles for each motor
         jointAngles = robot.getAngle()
-        logging.info(jointAngles)
+        logging.info("Joint angles: %s", jointAngles)
         
-        # First Step doesn't contains jointAngles
-        if len(jointAngles):
-            # Real Actuators
-            controller.servoRotate(jointAngles)
-            
-            # # Plot Robot Pose into Matplotlib for Debugging
-            # TODO: Matplotplib animation
-            # kn.initFK(jointAngles)
-            # kn.plotKinematics()
+        # Rotate the servo motors
+        controller.servoRotate(jointAngles)
+        
+        # # Plot Robot Pose into Matplotlib for Debugging
+        # TODO: Matplotplib animation
+        # kn.initFK(jointAngles)
+        # kn.plotKinematics()
 
         robot.step()
         consoleClear()
