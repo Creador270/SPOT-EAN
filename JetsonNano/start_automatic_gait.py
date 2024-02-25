@@ -22,6 +22,10 @@ import servo_controller
 from multiprocessing import Process
 from multiprocess_kb import KeyInterrupt
 from Kinematics.kinematicMotion import KinematicMotion, TrottingGait
+import logging
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 rtime=time.time()
 
@@ -94,7 +98,7 @@ def main(id, command_status):
 
         # calculate robot step command from keyboard inputs
         result_dict = command_status.get()
-        print(result_dict)
+        logging.info(result_dict)
         command_status.put(result_dict)
 
         # wait 3 seconds to start
@@ -111,7 +115,7 @@ def main(id, command_status):
 
         # Get current Angles for each motor
         jointAngles = robot.getAngle()
-        print(jointAngles)
+        logging.info(jointAngles)
         
         # First Step doesn't contains jointAngles
         if len(jointAngles):
@@ -137,10 +141,10 @@ if __name__ == "__main__":
     # Main Process 
     main(2, KeyInputs.command_status)
     
-    print("Terminate KeyBoard Input process")
+    logging.info("Terminate KeyBoard Input process")
     if KeyProcess.is_alive():
         KeyProcess.terminate()
     # except Exception as e:
-    #     print(e)
+    #     logging.info(e)
     # finally:
-    #     print("Done... :)")
+    #     logging.info("Done... :)")

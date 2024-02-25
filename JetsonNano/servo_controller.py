@@ -125,9 +125,9 @@ class Controllers:
         for x in range(len(self._val_list)):
             
             if x>=0 and x<15:
-                logging.info("Servo: " + str(x) + " Angle: " + str(self._val_list[x]))
+                # logging.info("Servo: " + str(x) + " Angle: " + str(self._val_list[x]))
                 self._val_list[x] = (self._val_list[x])
-                logging.info(self._val_list[x])
+                # logging.info(self._val_list[x])
 
                 if (self._val_list[x] > 180):
                     logging.info("Over 180!!")
