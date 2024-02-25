@@ -68,8 +68,8 @@ def consoleClear():
 
 
 
-Lp = np.array([[iXf, -100, spurWidth, 1], [iXf, -100, -spurWidth, 1],
-[-50, -100, spurWidth, 1], [-50, -100, -spurWidth, 1]])
+Lp = np.array([[iXf, -130, spurWidth, 1], [iXf, -130, -spurWidth, 1],
+[-50, -130, spurWidth, 1], [-50, -130, -spurWidth, 1]])
 
 motion=KinematicMotion(Lp)
 resetPose()
