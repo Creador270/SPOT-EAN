@@ -107,6 +107,7 @@ def main(id, command_status):
             robot.feetPosition(currentLp)
         else:
             robot.feetPosition(Lp)
+            result_dict['StartStepping'] = True
         #roll=-xr
         roll=0
         robot.bodyRotation((roll,math.pi/180*((joy_x)-128)/3,-(1/256*joy_y-0.5)))
