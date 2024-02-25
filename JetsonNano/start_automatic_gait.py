@@ -118,7 +118,10 @@ def main(id, command_status):
         jointAngles = robot.getAngle()
         logging.info("Joint angles: %s", jointAngles)
         
-        # Rotate the servo motors
+        if len(jointAngles) == 0:
+            logging.info("No joint angles")
+            continue
+        # Rotate the servo motors   
         controller.servoRotate(jointAngles)
         
         # # Plot Robot Pose into Matplotlib for Debugging
