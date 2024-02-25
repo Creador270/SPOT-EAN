@@ -66,7 +66,7 @@ class KeyInterrupt():
                             self.resetStatus()
                         else:
                             # print(key)
-                            # sleep(0.5)
+                            sleep(1)
                             self.keyCounter(key)
                         was_pressed = True
                         break

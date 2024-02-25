@@ -89,10 +89,6 @@ class TrottingGait:
 
         self.Rc=[-50,0,0,1] # rotation center
 
-
-    """
-    calculates the Lp - LegPosition for the configured gait for time t and original Lp of x,y,z
-    """
     def calcLeg(self,t,x,y,z):
         startLp=np.array([x-self.Sl/2.0,y,z-self.Sw,1])
         endY=0 #-0.8 # delta y to jump a bit before lifting legs
@@ -151,6 +147,9 @@ class TrottingGait:
         Rx=-1*self.Ro
         Fy=-100
         Ry=-100
-        r=np.array([self.calcLeg(td,Fx,Fy,spf),self.calcLeg(t2,Fx,Fy,-spf),self.calcLeg(rt2,Rx,Ry,spr),self.calcLeg(rtd,Rx,Ry,-spr)])
+        r=np.array([self.calcLeg(td,Fx,Fy,spf),
+                    self.calcLeg(t2,Fx,Fy,-spf),
+                    self.calcLeg(rt2,Rx,Ry,spr),
+                    self.calcLeg(rtd,Rx,Ry,-spr)])
         #print(r)
         return r

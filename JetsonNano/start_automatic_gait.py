@@ -120,14 +120,13 @@ def main(id, command_status):
         
         if len(jointAngles) == 0:
             logging.info("No joint angles")
-            continue
-        # Rotate the servo motors   
-        controller.servoRotate(jointAngles)
         
-        # # Plot Robot Pose into Matplotlib for Debugging
-        # TODO: Matplotplib animation
-        # kn.initFK(jointAngles)
-        # kn.plotKinematics()
+        else:
+            # Rotate the servo motors   
+            controller.servoRotate(jointAngles)
+            # # Plot Robot Pose into Matplotlib for Debugging
+            # kn.initFK(jointAngles)
+            # kn.plotKinematics()
 
         robot.step()
         consoleClear()
