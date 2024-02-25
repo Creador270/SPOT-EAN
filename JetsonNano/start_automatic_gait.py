@@ -98,7 +98,7 @@ def main(id, command_status):
         command_status.put(result_dict)
 
         # wait 3 seconds to start
-        if result_dict['StartStepping']:
+        if result_dict.get('StartStepping',False):
             currentLp = trotting.positions(d-3, result_dict)
             robot.feetPosition(currentLp)
         else:
