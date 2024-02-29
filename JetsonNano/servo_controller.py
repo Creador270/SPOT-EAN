@@ -137,7 +137,7 @@ class Controllers:
                     logging.info("Under 0!!")
                     self._val_list[x] = 1
                     continue
-                # self.kit.servo[x].angle = self._val_list[x]
+                self.kit.servo[x].angle = self._val_list[x]
 
 
 if __name__=="__main__":
