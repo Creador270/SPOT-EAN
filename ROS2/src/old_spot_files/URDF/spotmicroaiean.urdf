@@ -417,6 +417,7 @@
     <inertial>
       <mass value="0.11427"/>
       <inertia ixx="0.00004878868" ixy="-0.0000003775" ixz="-0.00000017136" iyy="0.00004225848" iyz="-0.000000434" izz="0.00003791423"/>
+    </inertial>
   </link>
   <link name="rear_right_leg_link">
     <visual>
