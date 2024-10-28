@@ -48,7 +48,14 @@ def generate_launch_description():
             package='joint_state_publisher_gui',
             executable='joint_state_publisher_gui',
             output='screen',
-            parameters=[{'robot_description': robot_desc}]
+           # parameters=[{'robot_description': robot_desc}]
+        ),
+
+        # Launch broadcaster IMU node
+        Node(
+            package='old_spot_viz',
+            executable='tf_broadcaster_imu_node',
+            output='screen'
         ),
 
         # Launch the rviz2 node

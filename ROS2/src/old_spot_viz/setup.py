@@ -25,6 +25,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'tf_broadcaster_imu_node = old_spot_viz.tf_broadcater_imu:main'
         ],
     },
 )
