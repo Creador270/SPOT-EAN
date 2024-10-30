@@ -12,7 +12,7 @@ logs/
 
 # C extensions
 *.so
-.vscode/
+ROS2/.vscode
 
 # Distribution / packaging
 .Python
