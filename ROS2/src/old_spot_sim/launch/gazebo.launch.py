@@ -20,7 +20,7 @@ def generate_launch_description():
 
     # Set the GAZEBO_MODEL_PATH
     os.environ["GAZEBO_MODEL_PATH"] = ":".join([os.path.join(urdf_dir, 'URDF'), os.path.join(parent_dir, 'meshes/stl_ean/STL'), parent_dir])    
-    pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
+    pkg_gazebo_ros = get_package_share_directory('ros_gz_sim')
     pkg_spot_sim = get_package_share_directory('old_spot_sim')
 
     gazebo_command = ExecuteProcess(
@@ -29,8 +29,10 @@ def generate_launch_description():
              'libgazebo_ros_factory.so'],
         output='screen'
     )
-    spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
-                        arguments=['-entity', 'spot', '-file', urdf],
+    spawn_entity = Node(package='ros_gz_sim', executable='create',
+                        arguments=['-name', 'spot', '-file', urdf, 
+                        #'-z', '0.1'
+                        ],
                         output='screen')
     
     # Include the controller.launch.py file

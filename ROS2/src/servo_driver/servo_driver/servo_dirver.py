@@ -1,8 +1,9 @@
 import rclpy
+import numpy as np
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
-from servo_driver.servo_controller_fix import Controllers
+from servo_driver.servo_controller import Controllers
 
 class ServoDriver(Node):
     def __init__(self):
@@ -14,15 +15,20 @@ class ServoDriver(Node):
             10
         )
 
+        self.declare_parameter('offset_joints', False)
+
         self.controller = Controllers()
+
+        ofset_motors = self.get_parameter('offset_joints').get_parameter_value().bool_value
+
+        if ofset_motors:
+            self.controller.servoRotate(np.zeros((4,3)))
 
     def joint_states_callback(self, msg):
         self.name = msg.name
-        self.position = msg.position
-        self.velocity = msg.velocity
-        self.effort = msg.effort
-
-        self.controller.servoRotate(self.position)
+        if msg.position:
+            self.position = np.array(msg.position)
+            self.controller.servoRotate(self.position.reshape(4,3))
 
 
 
