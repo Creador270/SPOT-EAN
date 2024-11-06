@@ -2,6 +2,7 @@ import sys
 sys.path.append("..")
 
 from servo_driver.kinematics import initIK
+import Kinematic
 import numpy as np
 from adafruit_servokit import ServoKit
 import board
@@ -52,7 +53,7 @@ class Controllers:
     legEndpoints array in the main part of the script.
     
     """
-    def __init__(self):
+    def __init__(self, kp=0.2, kd=0.2):
 
         logging.info("Initializing Servos")
         logging.info("Initializing Servos")
@@ -84,6 +85,11 @@ class Controllers:
 
         # All Angles for Leg 3 * 4 = 12 length
         self._thetas = []
+
+        self._current_angles = np.zeros(16)  # Almacena las posiciones 
+        self._previous_errors = np.zeros(16)  # Almacena el error anterior
+        self.kp = kp  # Ganancia proporcional
+        self.kd = kd  # Ganancia derivativa
 
     def getDegreeAngles(self, La):
         # radian to degree
@@ -117,27 +123,54 @@ class Controllers:
             
     def getServoAngles(self):
         return self._val_list
+    
+    def updateServoPosition(self, target_angles, dt=0.1):
+      """
+      Update the servo positions using PD control.
+      """
+      for i in range(len(target_angles)):
+          # Calcular el error actual
+          error = target_angles[i] - self._current_angles[i]
+          # Calcular la derivada del error
+          derivative = (error - self._previous_errors[i]) / dt
+          
+          # Calcular la salida del controlador PD
+          output = self.kp * error + self.kd * derivative
+          
+          # Actualizar la posición actual del servo
+          self._current_angles[i] += output
+          
+          # Asegurarse de que el ángulo esté dentro de los límites
+          self._current_angles[i] = max(0, min(180, self._current_angles[i]))
+
+          # Establecer el ángulo del servo
+          self.kit.servo[i].angle = self._current_angles[i]
+
+          # Almacenar el error actual para la próxima iteración
+          self._previous_errors[i] = error
 
     def servoRotate(self, thetas):
         
         self.angleToServo(thetas)
+        target_angles = self.getServoAngles()
+        self.updateServoPosition(target_angles)
         #self.angleToServo(np.zeros((4,3)))
-        for x in range(len(self._val_list)):
+        # for x in range(len(self._val_list)):
             
-            if x>=0 and x<15:
-                # logging.info("Servo: " + str(x) + " Angle: " + str(self._val_list[x]))
-                self._val_list[x] = (self._val_list[x])
-                # logging.info(self._val_list[x])
+        #     if x>=0 and x<15:
+        #         # logging.info("Servo: " + str(x) + " Angle: " + str(self._val_list[x]))
+        #         self._val_list[x] = (self._val_list[x])
+        #         # logging.info(self._val_list[x])
 
-                if (self._val_list[x] > 180):
-                    logging.info("Over 180!!")
-                    self._val_list[x] = 179
-                    continue
-                if (self._val_list[x] <= 0):
-                    logging.info("Under 0!!")
-                    self._val_list[x] = 1
-                    continue
-                self.kit.servo[x].angle = self._val_list[x]
+        #         if (self._val_list[x] > 180):
+        #             logging.info("Over 180!!")
+        #             self._val_list[x] = 179
+        #             continue
+        #         if (self._val_list[x] <= 0):
+        #             logging.info("Under 0!!")
+        #             self._val_list[x] = 1
+        #             continue
+        #         self.kit.servo[x].angle = self._val_list[x]
 
 
 if __name__=="__main__":
@@ -180,9 +213,12 @@ if __name__=="__main__":
     #                        [100,-100,-87.5,1],
     #                        [-100,-100,87.5,1],
     #                        [-100,-100,-87.5,1]])
+    # moduleKinematics = Kinematic()
+    # moduleKinematics.drawRobot(legEndpoints,(0,0,0),(0,0,0))
+    # thetas = moduleKinematics.thetas
     # thetas = initIK(legEndpoints) #radians
     thetas = np.zeros((4,3))
-    controller = Controllers()
+    controller = Controllers(kp=0.2, kd=0.2)
     
     # Get radian thetas, transform to integer servo angles
     # then, rotate servos
