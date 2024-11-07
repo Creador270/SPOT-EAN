@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 from servo_driver.kinematics import initIK
-import Kinematic
+from kinematics import Kinematic
 import numpy as np
 from adafruit_servokit import ServoKit
 import board
@@ -73,10 +73,10 @@ class Controllers:
             6: 150,  # front_right UP
             8: 170,  # back_left DOWN
             9: 60,  # back_left MID
-            10: 140, # back_left UP
-            12: 10,  # back_right DOWN
+            10: 135, # back_left UP
+            12: 20,  # back_right DOWN
             13: 145, # back_right MID
-            14: 70   # back_right UP
+            14: 60   # back_right UP
         }
         
         # self._servo_offsets = {k: 90 for k in range(16)}
@@ -151,26 +151,26 @@ class Controllers:
 
     def servoRotate(self, thetas):
         
+        #target_angles = self.getServoAngles()
+        #self.updateServoPosition(target_angles)
         self.angleToServo(thetas)
-        target_angles = self.getServoAngles()
-        self.updateServoPosition(target_angles)
         #self.angleToServo(np.zeros((4,3)))
-        # for x in range(len(self._val_list)):
+        for x in range(len(self._val_list)):
             
-        #     if x>=0 and x<15:
-        #         # logging.info("Servo: " + str(x) + " Angle: " + str(self._val_list[x]))
-        #         self._val_list[x] = (self._val_list[x])
-        #         # logging.info(self._val_list[x])
+            if x>=0 and x<15:
+                # logging.info("Servo: " + str(x) + " Angle: " + str(self._val_list[x]))
+                self._val_list[x] = (self._val_list[x])
+                # logging.info(self._val_list[x])
 
-        #         if (self._val_list[x] > 180):
-        #             logging.info("Over 180!!")
-        #             self._val_list[x] = 179
-        #             continue
-        #         if (self._val_list[x] <= 0):
-        #             logging.info("Under 0!!")
-        #             self._val_list[x] = 1
-        #             continue
-        #         self.kit.servo[x].angle = self._val_list[x]
+                if (self._val_list[x] > 180):
+                    logging.info("Over 180!!")
+                    self._val_list[x] = 179
+                    continue
+                if (self._val_list[x] <= 0):
+                    logging.info("Under 0!!")
+                    self._val_list[x] = 1
+                    continue
+                self.kit.servo[x].angle = self._val_list[x]
 
 
 if __name__=="__main__":
@@ -222,9 +222,23 @@ if __name__=="__main__":
     
     # Get radian thetas, transform to integer servo angles
     # then, rotate servos
-    controller.servoRotate(thetas)
+    #th = np.array([[0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+    #th = np.array([[0.0, -1.345, 2.590], [0.0, -1.345, 2.590], [0.0, -1.345, 2.590], [0.0, -1.345, 2.590]])
+    #controller.servoRotate(th)
+    controller.servoRotate(initIK(np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]])))
     logging.info(f"Thetas: {controller._thetas}")
+    time.sleep(1)
+    while True:
+        for i in np.arange(-60, -150, -2):
+                controller.servoRotate(initIK(np.array([[60,i,87.5,1],[60,i,-87.5,1],[-100,i,87.5,1],[-100,i,-87.5,1]])))
+                logging.info(f"Thetas: {controller._thetas}")
+                #time.sleep(0.01)
+        for i in np.arange(-150, -60, 2):
+                controller.servoRotate(initIK(np.array([[60,i,87.5,1],[60,i,-87.5,1],[-100,i,87.5,1],[-100,i,-87.5,1]])))
+                logging.info(f"Thetas: {controller._thetas}")
+                #time.sleep(0.01)
+                
     # Get AngleValues for Debugging
-    svAngle = controller.getServoAngles()
-    logging.info(svAngle)
+    # svAngle = controller.getServoAngles()
+    # logging.info(svAngle)
     
