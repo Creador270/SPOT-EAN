@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            "inv_k_node = inv_k.kinematics_node:main"
         ],
     },
 )

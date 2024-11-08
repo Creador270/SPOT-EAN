@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 from servo_driver.kinematics import initIK
-from kinematics import Kinematic
+from servo_driver.kinematics import Kinematic
 import numpy as np
 from adafruit_servokit import ServoKit
 import board
@@ -213,17 +213,12 @@ if __name__=="__main__":
     #                        [100,-100,-87.5,1],
     #                        [-100,-100,87.5,1],
     #                        [-100,-100,-87.5,1]])
-    # moduleKinematics = Kinematic()
-    # moduleKinematics.drawRobot(legEndpoints,(0,0,0),(0,0,0))
-    # thetas = moduleKinematics.thetas
-    # thetas = initIK(legEndpoints) #radians
+ 
     thetas = np.zeros((4,3))
     controller = Controllers(kp=0.2, kd=0.2)
     
     # Get radian thetas, transform to integer servo angles
     # then, rotate servos
-    #th = np.array([[0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
-    #th = np.array([[0.0, -1.345, 2.590], [0.0, -1.345, 2.590], [0.0, -1.345, 2.590], [0.0, -1.345, 2.590]])
     #controller.servoRotate(th)
     controller.servoRotate(initIK(np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]])))
     logging.info(f"Thetas: {controller._thetas}")
