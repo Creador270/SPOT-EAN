@@ -1,4 +1,5 @@
 import os
+import launch
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
@@ -18,8 +19,13 @@ def generate_launch_description():
     
     with open(urdf, 'r') as infp:
         robot_desc = infp.read()
+
+    debug_mode = LaunchConfiguration('debug_mode')
         
     return LaunchDescription([
+
+        launch.actions.DeclareLaunchArgument('debug_mode', default_value='false', description='Activar modo debug para motores'),
+
         # Declare the launch argument
         DeclareLaunchArgument(
             'urdf',
@@ -34,21 +40,13 @@ def generate_launch_description():
             output='screen',
             parameters=[{'robot_description': robot_desc}]
         ),
-        
-        # Launch the joint_state_publisher node
+
+        # Launch servo driver node
         Node(
-            package='joint_state_publisher',
-            executable='joint_state_publisher',
+            package='servo_driver',
+            executable='servo_driver_node',
             output='screen',
-            parameters=[{'robot_description': robot_desc}]
-        ),
-        
-        # Launch the joint_state_publisher_gui node
-        Node(
-            package='joint_state_publisher_gui',
-            executable='joint_state_publisher_gui',
-            output='screen',
-           # parameters=[{'robot_description': robot_desc}]
+            parameters=[{'offset_joints': debug_mode}]
         ),
 
         # Launch broadcaster IMU node
@@ -64,5 +62,24 @@ def generate_launch_description():
             executable='rviz2',
             arguments=['-d', rviz_config],
             output='screen'
+        ),
+
+        # Launch the joint_state_publisher_gui node
+        Node(
+            package='joint_state_publisher_gui',
+            executable='joint_state_publisher_gui',
+            output='screen',
+            parameters=[{'robot_description': robot_desc}],
+            condition=launch.conditions.IfCondition(debug_mode)
+        ),
+
+        # Launch the joint_state_publisher node
+        Node(
+            package='inv_k',
+            executable='inv_k_node',
+            name='joint_state_publisher',
+            output='screen',
+            # parameters=[{'robot_description': robot_desc}],
+            condition=launch.conditions.UnlessCondition(debug_mode) 
         ),
     ])

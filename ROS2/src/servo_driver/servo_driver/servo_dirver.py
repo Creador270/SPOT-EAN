@@ -20,14 +20,14 @@ class ServoDriver(Node):
 
         self.controller = Controllers()
 
-        ofset_motors = self.get_parameter('offset_joints').get_parameter_value().bool_value
+        motors_debug = self.get_parameter('offset_joints').get_parameter_value().bool_value
 
-        if ofset_motors:
+        if motors_debug:
+            self.controller.servoRotate(np.zeros((4,3)))
+        else:
             self.invKin = Kinematic()
             self.invKin.drawRobot(np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]]), (0,0,0), (0,0,0))
             self.controller.servoRotate(self.invKin.thetas)
-        else:
-            self.controller.servoRotate(np.zeros((4,3)))
             
 
     def joint_states_callback(self, msg):

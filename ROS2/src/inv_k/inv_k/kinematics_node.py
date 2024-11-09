@@ -1,5 +1,6 @@
 import rclpy
 import math
+import time
 import numpy as np
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
@@ -41,55 +42,74 @@ class kinematicsNode(Node):
         self.joint_state_msg = JointState()
       
         self.joint_state_msg.name = list(self._servo_Articulations.keys()) # Nombres de las articulaciones
-        self.joint_state_msg.position = [0.0] * 12
+        self.joint_state_msg.position = [0.0] * len(self.joint_state_msg.name)
         self.joint_state_msg.velocity = []
         self.joint_state_msg.effort = []
 
         self.timer = self.create_timer(0.1, self.test_actions)  # Publica cada 0.1 segundos
 
-        if default_position:
-            self.legEndpoints=np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]]), (0,0,0), (0,0,0)
-            self.joint_state_msg.position = self.legEndpoints
+        self.legEndpoints=np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]])
+        
+        time.sleep(1)
+
+        self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
+        self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
+        self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
+        self.publisher_.publish(self.joint_state_msg)
+        
+        for i in np.arange(-60, -150, -2):
+            self.invk_model.drawRobot(np.array([[60,i,87.5,1],[60,i,-87.5,1],[-100,i,87.5,1],[-100,i,-87.5,1]]), (0,0,0), (0,0,0))
+            self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
+            self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
             self.publisher_.publish(self.joint_state_msg)
 
-    def euler_to_quaternion(roll, pitch, yaw):
+    def euler_to_quaternion(self, roll, pitch, yaw):
         qx = math.sin(roll / 2) * math.cos(pitch / 2) * math.cos(yaw / 2) - math.cos(roll / 2) * math.sin(pitch / 2) * math.sin(yaw / 2)
         qy = math.cos(roll / 2) * math.sin(pitch / 2) * math.cos(yaw / 2) + math.sin(roll / 2) * math.cos(pitch / 2) * math.sin(yaw / 2)
         qz = math.cos(roll / 2) * math.cos(pitch / 2) * math.sin(yaw / 2) - math.sin(roll / 2) * math.sin(pitch / 2) * math.cos(yaw / 2)
         qw = math.cos(roll / 2) * math.cos(pitch / 2) * math.cos(yaw / 2) + math.sin(roll / 2) * math.sin(pitch / 2) * math.sin(yaw / 2)
         return qx, qy, qz, qw
     
+    def quaternion_to_euler(self, x, y, z, w):
+        ysqr = y * y
+        t0 = +2.0 * (w * x + y * z)
+        t1 = +1.0 - 2.0 * (x * x + ysqr)
+        roll = math.atan2(t0, t1)
+        t2 = +2.0 * (w * y - z * x)
+        t2 = +1.0 if t2 > +1.0 else t2
+        t2 = -1.0 if t2 < -1.0 else t2
+        pitch = math.asin(t2)
+        t3 = +2.0 * (w * z + x * y)
+        t4 = +1.0 - 2.0 * (ysqr + z * z)
+        yaw = math.atan2(t3, t4)
+        return roll, pitch, yaw
+    
     def imuMagCallback(self, msg):
-        t = TransformStamped()
-        t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = "base_link"
-
+        # Optener la marca de tiempo del mensaje IMU
+        self.dt = msg.header.stamp
         # Asignar la orientación del IMU al cuaternión de rotación
-        t.transform.rotation.x = msg.orientation.x
-        t.transform.rotation.y = msg.orientation.y
-        t.transform.rotation.z = msg.orientation.z
-        t.transform.rotation.w = msg.orientation.w
+        qx = msg.orientation.x
+        qy = msg.orientation.y
+        qz = msg.orientation.z
+        qw = msg.orientation.w
 
-        # Asignar la traslación (si es necesario, de lo contrario, dejar en cero)
-        t.transform.translation.x = 0.0
-        t.transform.translation.y = 0.0
-        t.transform.translation.z = 0.0
+        self.euler_angles = self.quaternion_to_euler(qx, qy, qz, qw)
 
-    def test_actions(self):
-        legEndpoints = np.array([[60,-150,87.5,1],[60,-150,-87.5,1],[-100,-150,87.5,1],[-100,-150,-87.5,1]])
-        
-        for i in range(legEndpoints.shape[0]):
-            for j in range(-150, -60, 10):
-                legEndpoints[i][1] = j
-                self.invk_model.drawRobot(legEndpoints, (0,0,0), (0,0,0))
+    def test_actions(self):        
+        for i in range(self.legEndpoints.shape[0]):
+            for j in range(-150, -60, 5):
+                self.legEndpoints[i][1] = j
+                self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
                 print(f'thetas: {(self.invk_model.thetas.flatten())}')
                 self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
+                self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
                 self.publisher_.publish(self.joint_state_msg)
             for j in range(-60, -150, -10):
-                legEndpoints[i][1] = j
-                self.invk_model.drawRobot(legEndpoints, (0,0,0), (0,0,0))
+                self.legEndpoints[i][1] = j
+                self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
                 print(f'thetas: {(self.invk_model.thetas.flatten())}')
                 self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
+                self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
                 self.publisher_.publish(self.joint_state_msg)
 
 def main(args=None):
