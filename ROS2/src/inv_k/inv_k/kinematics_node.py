@@ -2,6 +2,7 @@ import rclpy
 import math
 import time
 import numpy as np
+#import jax.numpy as jnp
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
@@ -57,7 +58,7 @@ class kinematicsNode(Node):
         self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
         self.publisher_.publish(self.joint_state_msg)
         
-        for i in np.arange(-60, -150, -2):
+        for i in np.arange(-60, -150, -5):
             self.invk_model.drawRobot(np.array([[60,i,87.5,1],[60,i,-87.5,1],[-100,i,87.5,1],[-100,i,-87.5,1]]), (0,0,0), (0,0,0))
             self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
             self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
@@ -95,22 +96,37 @@ class kinematicsNode(Node):
 
         self.euler_angles = self.quaternion_to_euler(qx, qy, qz, qw)
 
+    def publish_joints(self):
+        #print(f'thetas: {(self.invk_model.thetas.flatten())}')
+        self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
+        self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
+        self.publisher_.publish(self.joint_state_msg)
+
+    def rotations(self):
+        for yaw in range(0, 20):
+            self.invk_model.drawRobot(self.legEndpoints, (np.radians(yaw),0,0), (0,0,0))
+            self.publish_joints()
+            
+        for pitch in range(0, 20):
+            self.invk_model.drawRobot(self.legEndpoints, (0,np.radians(pitch),0), (0,0,0))
+            self.publish_joints()
+        for yaw in range(20, -20):
+            self.invk_model.drawRobot(self.legEndpoints, (np.radians(yaw),0,0), (0,0,0))
+            self.publish_joints()
+        for pitch in range(20, -20):
+            self.invk_model.drawRobot(self.legEndpoints, (0,np.radians(pitch),0), (0,0,0))
+            self.publish_joints()
+
     def test_actions(self):        
         for i in range(self.legEndpoints.shape[0]):
-            for j in range(-150, -60, 5):
+            for j in range(-150, -60, 10):
                 self.legEndpoints[i][1] = j
                 self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
-                print(f'thetas: {(self.invk_model.thetas.flatten())}')
-                self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
-                self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
-                self.publisher_.publish(self.joint_state_msg)
+                self.publish_joints()
             for j in range(-60, -150, -10):
                 self.legEndpoints[i][1] = j
                 self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
-                print(f'thetas: {(self.invk_model.thetas.flatten())}')
-                self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
-                self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
-                self.publisher_.publish(self.joint_state_msg)
+                self.publish_joints()
 
 def main(args=None):
   rclpy.init(args=args)

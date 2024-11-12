@@ -77,7 +77,6 @@ def generate_launch_description():
         Node(
             package='inv_k',
             executable='inv_k_node',
-            name='joint_state_publisher',
             output='screen',
             # parameters=[{'robot_description': robot_desc}],
             condition=launch.conditions.UnlessCondition(debug_mode) 
