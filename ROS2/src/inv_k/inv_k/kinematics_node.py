@@ -51,7 +51,7 @@ class kinematicsNode(Node):
 
         self.legEndpoints=np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]])
         
-        time.sleep(1)
+        time.sleep(6)
 
         self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
         self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
