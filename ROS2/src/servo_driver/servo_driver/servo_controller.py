@@ -71,7 +71,7 @@ class Controllers:
             4: 10,   # front_right DOWN
             5: 150,  # front_right MID
             6: 150,  # front_right UP
-            8: 170,  # back_left DOWN
+            11: 170,  # back_left DOWN
             9: 60,  # back_left MID
             10: 135, # back_left UP
             12: 20,  # back_right DOWN
@@ -108,13 +108,13 @@ class Controllers:
             (2, 0, 1),   # FL Shoulder
             (4, 2, 1),   # FR Lower
             (5, 1, 1),   # FR Upper
-            (6, 0, -1),  # FR Shoulder
-            (8, 2, -1),  # BL Lower
+            (6, 0, 1),  # FR Shoulder
+            (11, 2, -1),  # BL Lower
             (9, 1, -1),  # BL Upper
             (10, 0, -1), # BL Shoulder
             (12, 2, 1),  # BR Lower
             (13, 1, 1),  # BR Upper
-            (14, 0, 1)   # BR Shoulder
+            (14, 0, -1)   # BR Shoulder
         ]
 
         for i, (servo, joint, direction) in enumerate(mapping):

@@ -208,10 +208,10 @@ class Kinematic:
         self.legIK(Ix.dot(np.linalg.inv(Trb).dot(Lp[3])))])
 
 # Inverse Kinematics
-def initIK(Lp):
+def initIK(Lp, angles):
     setupView(200).view_init(elev=12., azim=28)
     moduleKinematics = Kinematic()
-    moduleKinematics.drawRobot(Lp,(0,0,0),(0,0,0))
+    moduleKinematics.drawRobot(Lp,angles,(0,0,0))
     
     return moduleKinematics.thetas
 
@@ -237,10 +237,7 @@ def plotKinematics():
     plt.show()
 
 if __name__=="__main__":
-    Lp=np.array([[100,-100,100,1], \
-                [100,-100,-100,1], \
-                [-100,-100,100,1], \
-                [-100,-100,-100,1]])
+    Lp=np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]])
 
     # case #1
     '''
@@ -265,7 +262,7 @@ if __name__=="__main__":
 
     # Pose Visualization
 
-    initIK(Lp)
+    print(initIK(Lp, (np.radians(20),0,0)))
     # plotKinematics()
 
     # Or 

@@ -50,19 +50,22 @@ class kinematicsNode(Node):
         self.timer = self.create_timer(0.1, self.test_actions)  # Publica cada 0.1 segundos
 
         self.legEndpoints=np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]])
-        
-        time.sleep(6)
 
         self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
         self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
         self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
         self.publisher_.publish(self.joint_state_msg)
+
+        time.sleep(3)
         
         for i in np.arange(-60, -150, -5):
-            self.invk_model.drawRobot(np.array([[60,i,87.5,1],[60,i,-87.5,1],[-100,i,87.5,1],[-100,i,-87.5,1]]), (0,0,0), (0,0,0))
+            self.legEndpoints[:, 1] = i
+            self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
             self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
             self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
             self.publisher_.publish(self.joint_state_msg)
+
+        time.sleep(2)
 
     def euler_to_quaternion(self, roll, pitch, yaw):
         qx = math.sin(roll / 2) * math.cos(pitch / 2) * math.cos(yaw / 2) - math.cos(roll / 2) * math.sin(pitch / 2) * math.sin(yaw / 2)
@@ -97,21 +100,27 @@ class kinematicsNode(Node):
         self.euler_angles = self.quaternion_to_euler(qx, qy, qz, qw)
 
     def publish_joints(self):
-        #print(f'thetas: {(self.invk_model.thetas.flatten())}')
+        print(f'thetas: {(self.invk_model.thetas.flatten())}')
         self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
         self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
         self.publisher_.publish(self.joint_state_msg)
 
     def rotations(self):
+        self.invk_model.drawRobot(self.legEndpoints, (np.radians(20),0,0), (0,0,0))
+        self.publish_joints()
+
         for yaw in range(0, 20):
+            self.invk_model.drawRobot(self.legEndpoints, (np.radians(yaw),0,0), (0,0,0))
+            self.publish_joints()
+        for yaw in range(20, 0):
+            self.invk_model.drawRobot(self.legEndpoints, (np.radians(yaw),0,0), (0,0,0))
+            self.publish_joints()
+        for yaw in range(-20, 0):
             self.invk_model.drawRobot(self.legEndpoints, (np.radians(yaw),0,0), (0,0,0))
             self.publish_joints()
             
         for pitch in range(0, 20):
             self.invk_model.drawRobot(self.legEndpoints, (0,np.radians(pitch),0), (0,0,0))
-            self.publish_joints()
-        for yaw in range(20, -20):
-            self.invk_model.drawRobot(self.legEndpoints, (np.radians(yaw),0,0), (0,0,0))
             self.publish_joints()
         for pitch in range(20, -20):
             self.invk_model.drawRobot(self.legEndpoints, (0,np.radians(pitch),0), (0,0,0))
