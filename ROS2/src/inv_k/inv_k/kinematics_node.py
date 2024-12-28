@@ -5,9 +5,11 @@ import numpy as np
 #import jax.numpy as jnp
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
+from std_msgs.msg import Header
 from geometry_msgs.msg import Pose
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import TransformStamped
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
 from inv_k.kinematics import Kinematic
 
@@ -16,56 +18,152 @@ class kinematicsNode(Node):
     def __init__(self):
         super().__init__('kinematics_node')
         # self.subscription = self.create_subscription(Pose, 'Pose', self.stateCallback, 10)
-        self.subscription = self.create_subscription(Imu, 'imu/data', self.imuMagCallback, 10)
-        self.publisher_ = self.create_publisher(JointState, 'joint_states', 10)
 
-        self._servo_Articulations = {
-            'joint_front_left_shoulder': 0,  # front_left UP
-            'joint_front_left_leg': 0,  # front_left MID
-            'joint_front_left_foot': 0,   # front_left DOWN
-            'joint_front_right_shoulder': 0,   # front_right UP
-            'joint_front_right_leg': 0,  # front_right MID
-            'joint_front_right_foot': 0,  # front_right DOWN
-            'joint_rear_left_shoulder': 0,  # back_left UP
-            'joint_rear_left_leg': 0,  # back_left MID
-            'joint_rear_left_foot': 0, # back_left DOWN
-            'joint_rear_right_shoulder': 0,  # back_right UP
-            'joint_rear_right_leg': 0, # back_right MID
-            'joint_rear_right_foot': 0   # back_right DOWN
-        }
+        # Configure QoS profile for better real-time performance
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
 
-        self.declare_parameter('default_position', False)
+        # Initialize publisher with QoS profile
+        self.joint_publisher = self.create_publisher(
+            JointState,
+            'joint_states',
+            qos_profile
+        )
+
+        # self.subscription = self.create_subscription(Imu, 'imu/data', self.imuMagCallback, 10)
+        # self.publisher_ = self.create_publisher(JointState, 'joint_states', 10)
 
         self.invk_model = Kinematic()
 
-        default_position = self.get_parameter('default_position').get_parameter_value().bool_value
-
-        self.joint_state_msg = JointState()
-      
-        self.joint_state_msg.name = list(self._servo_Articulations.keys()) # Nombres de las articulaciones
-        self.joint_state_msg.position = [0.0] * len(self.joint_state_msg.name)
-        self.joint_state_msg.velocity = []
-        self.joint_state_msg.effort = []
-
-        self.timer = self.create_timer(0.1, self.test_actions)  # Publica cada 0.1 segundos
-
-        self.legEndpoints=np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]])
-
-        self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
-        self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
-        self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
-        self.publisher_.publish(self.joint_state_msg)
-
-        time.sleep(3)
+        # self.joint_state_msg = JointState()
+        self.joint_names = [
+            'joint_front_left_shoulder',  # front_left UP
+            'joint_front_left_leg',  # front_left MID
+            'joint_front_left_foot',   # front_left DOWN
+            'joint_front_right_shoulder',   # front_right UP
+            'joint_front_right_leg',  # front_right MID
+            'joint_front_right_foot',  # front_right DOWN
+            'joint_rear_left_shoulder',  # back_left UP
+            'joint_rear_left_leg',  # back_left MID
+            'joint_rear_left_foot', # back_left DOWN
+            'joint_rear_right_shoulder',  # back_right UP
+            'joint_rear_right_leg', # back_right MID
+            'joint_rear_right_foot'   # back_right DOWN
+        ]
+        # self.joint_state_msg.position = [0.0] * len(self.joint_state_msg.name)
+        # self.joint_state_msg.velocity = []
+        # self.joint_state_msg.effort = []
         
-        for i in np.arange(-60, -150, -5):
-            self.legEndpoints[:, 1] = i
-            self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
-            self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
-            self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
-            self.publisher_.publish(self.joint_state_msg)
+        # Increment
+        self.height_increment = 30
 
-        time.sleep(2)
+        # Inicial State
+        self.legIndex = 0
+        self.legState = [1, 1, 1, 1]
+        self.legEndpoints=np.array([[60,-60,87.5,1],
+                                    [60,-60,-87.5,1],
+                                    [-100,-60,87.5,1],
+                                    [-100,-60,-87.5,1]])
+        
+        # Create timer for routine execution
+        self.create_timer(0.1, self.timer_callback)
+
+        self.get_logger().info('Spot Joint Publisher Node initialized')
+        # self.timer = self.create_timer(0.1, self.test_actions)  # Publica cada 0.1 segundos
+
+        # self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
+        # self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
+        # self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
+        # self.publisher_.publish(self.joint_state_msg)
+
+        # time.sleep(3)
+        
+        # for i in np.arange(-60, -150, -5):
+        #     self.legEndpoints[:, 1] = i
+        #     self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
+        #     self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
+        #     self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
+        #     self.publisher_.publish(self.joint_state_msg)
+
+        # time.sleep(2)
+    def publish_joints(self, joints_state):
+        print(f'thetas: {joints_state}')
+        msg = JointState()
+        msg.header = Header()
+        msg.header.stamp = self.get_clock().now().to_msg()
+
+        if len (joints_state) == len(self.joint_names):
+            msg.name = self.joint_names
+            msg.position = joints_state.tolist()
+        else:
+            self.get_logger().error('Invalid number of joints')
+        msg.velocity = []
+        msg.effort = []
+        self.joint_publisher.publish(msg)
+
+    def test_actions(self):
+        """
+        Calculate the inverse kinematics for a given end
+        effector position using theinverse kinematics model.
+        """
+        try:
+            # Calculate the inverse kinematics
+            joint_angles = self.invk_model.calcIK(
+                self.legEndpoints,  #position of each leg
+                (0,0,0),            #orientation of the robot
+                (0,0,0)             #position of the center poin of the robot
+                )
+            return joint_angles.flatten()
+        
+        except Exception as e:
+            self.get_logger().error(f'Error calculating joint positions: {str(e)}')
+            return None
+        
+        # for i in range(self.legEndpoints.shape[0]):
+        #     for j in range(-150, -60, 10):
+        #         self.legEndpoints[i][1] = j
+        #         self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
+        #         self.publish_joints()
+        #     for j in range(-60, -150, -10):
+        #         self.legEndpoints[i][1] = j
+        #         self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
+        #         self.publish_joints()
+    
+    def timer_callback(self):
+        """ 
+        This function is called every 0.1 seconds to execute the inverse kinematics.
+        """
+        joints_positions = self.test_actions()
+
+        if joints_positions is not None:
+
+            self.publish_joints(joints_positions) #Publish the joint positions
+
+            #Update the joint_positions of the robot
+            if self.legState == [1, 1, 1, 1]:
+                self.legEndpoints[:, 1] -= 10
+                if self.legEndpoints[:, 1].min() <= -150:
+                    self.legState = [0, 0, 0, 0]
+                
+            else:
+                if self.legState[self.legIndex] == 0:
+                    self.legEndpoints[self.legIndex, 1] += self.height_increment
+                    if self.legEndpoints[self.legIndex, 1].max() >= -60:
+                        self.legState[self.legIndex] = 1
+                else:
+                    self.legEndpoints[self.legIndex, 1] -= self.height_increment
+                    if self.legEndpoints[self.legIndex, 1].min() <= -150:
+                        self.legState[self.legIndex] = 0
+                        if self.legIndex == 3:
+                            self.legIndex = 0
+                        else:
+                            self.legIndex += 1
+        # self.joint_state_msg.position = self.test_actions()
+        # self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
+        # self.publisher_.publish(self.joint_state_msg)
 
     def euler_to_quaternion(self, roll, pitch, yaw):
         qx = math.sin(roll / 2) * math.cos(pitch / 2) * math.cos(yaw / 2) - math.cos(roll / 2) * math.sin(pitch / 2) * math.sin(yaw / 2)
@@ -99,12 +197,6 @@ class kinematicsNode(Node):
 
         self.euler_angles = self.quaternion_to_euler(qx, qy, qz, qw)
 
-    def publish_joints(self):
-        print(f'thetas: {(self.invk_model.thetas.flatten())}')
-        self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
-        self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
-        self.publisher_.publish(self.joint_state_msg)
-
     def rotations(self):
         self.invk_model.drawRobot(self.legEndpoints, (np.radians(20),0,0), (0,0,0))
         self.publish_joints()
@@ -126,21 +218,10 @@ class kinematicsNode(Node):
             self.invk_model.drawRobot(self.legEndpoints, (0,np.radians(pitch),0), (0,0,0))
             self.publish_joints()
 
-    def test_actions(self):        
-        for i in range(self.legEndpoints.shape[0]):
-            for j in range(-150, -60, 10):
-                self.legEndpoints[i][1] = j
-                self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
-                self.publish_joints()
-            for j in range(-60, -150, -10):
-                self.legEndpoints[i][1] = j
-                self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
-                self.publish_joints()
-
 def main(args=None):
   rclpy.init(args=args)
-  node = kinematicsNode()
   try:
+      node = kinematicsNode()
       rclpy.spin(node)
   except KeyboardInterrupt:
       pass
