@@ -62,7 +62,7 @@ class kinematicsNode(Node):
 
         # Inicial State
         self.legIndex = 0
-        self.legState = [1, 1, 1, 1]
+        self.legState = np.array([1, 1, 1, 1])
         self.legEndpoints=np.array([[60,-60,87.5,1],
                                     [60,-60,-87.5,1],
                                     [-100,-60,87.5,1],
@@ -143,10 +143,10 @@ class kinematicsNode(Node):
             self.publish_joints(joints_positions) #Publish the joint positions
 
             #Update the joint_positions of the robot
-            if self.legState == [1, 1, 1, 1]:
+            if all(self.legState == 1):
                 self.legEndpoints[:, 1] -= 10
                 if self.legEndpoints[:, 1].min() <= -150:
-                    self.legState = [0, 0, 0, 0]
+                    self.legState[:] = 0
                 
             else:
                 if self.legState[self.legIndex] == 0:
@@ -157,10 +157,7 @@ class kinematicsNode(Node):
                     self.legEndpoints[self.legIndex, 1] -= self.height_increment
                     if self.legEndpoints[self.legIndex, 1].min() <= -150:
                         self.legState[self.legIndex] = 0
-                        if self.legIndex == 3:
-                            self.legIndex = 0
-                        else:
-                            self.legIndex += 1
+                        self.legIndex = (self.legIndex + 1) % 4
         # self.joint_state_msg.position = self.test_actions()
         # self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
         # self.publisher_.publish(self.joint_state_msg)
