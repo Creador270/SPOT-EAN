@@ -61,7 +61,8 @@ class kinematicsNode(Node):
         self.height_increment = 30
 
         # Inicial State
-        self.legIndex = 0
+        self.two_leg_index_map = {(0, 3): [1, 2], (1, 2): [0, 3]}
+        self.legIndex = [0, 3]
         self.legState = np.array([1, 1, 1, 1])
         self.legEndpoints=np.array([[60,-60,87.5,1],
                                     [60,-60,-87.5,1],
@@ -70,6 +71,8 @@ class kinematicsNode(Node):
         
         # Create timer for routine execution
         self.create_timer(0.1, self.timer_callback)
+
+        time.sleep(2) # Wait to the user can verify the robot
 
         self.get_logger().info('Spot Joint Publisher Node initialized')
         # self.timer = self.create_timer(0.1, self.test_actions)  # Publica cada 0.1 segundos
@@ -149,7 +152,7 @@ class kinematicsNode(Node):
                     self.legState[:] = 0
                 
             else:
-                if self.legState[self.legIndex] == 0:
+                if all(self.legState[self.legIndex] == 0):
                     self.legEndpoints[self.legIndex, 1] += self.height_increment
                     if self.legEndpoints[self.legIndex, 1].max() >= -60:
                         self.legState[self.legIndex] = 1
@@ -157,7 +160,7 @@ class kinematicsNode(Node):
                     self.legEndpoints[self.legIndex, 1] -= self.height_increment
                     if self.legEndpoints[self.legIndex, 1].min() <= -150:
                         self.legState[self.legIndex] = 0
-                        self.legIndex = (self.legIndex + 1) % 4
+                        self.legIndex = self.two_leg_index_map.get(tuple(self.legIndex))
         # self.joint_state_msg.position = self.test_actions()
         # self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
         # self.publisher_.publish(self.joint_state_msg)
