@@ -88,4 +88,12 @@ def generate_launch_description():
         #     # parameters=[{'robot_description': robot_desc}],
         #     condition=launch.conditions.UnlessCondition(debug_mode) 
         # ),
+
+        #joystick Node
+        Node(
+            package='joystick_ros2',
+            executable='joystick_ros2',
+            output='screen',
+            condition=launch.conditions.UnlessCondition(debug_mode) 
+        )
     ])

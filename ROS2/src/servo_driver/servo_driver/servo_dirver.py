@@ -3,17 +3,25 @@ import numpy as np
 from servo_driver.kinematics import Kinematic 
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
-
+from rclpy.qos import QoSProfile, ReliabilityPolicy, QoSReliabilityPolicy, DurabilityPolicy, QoSDurabilityPolicy
 from servo_driver.servo_controller import Controllers
 
 class ServoDriver(Node):
     def __init__(self):
         super().__init__('servo_dirver_node')
+
+        # Configure QoS profile for better real-time performance
+        qos_profile = QoSProfile(
+                reliability=QoSReliabilityPolicy.BEST_EFFORT,
+                durability=QoSDurabilityPolicy.VOLATILE,
+                depth=10
+                )
+        
         self.subscription = self.create_subscription(
             JointState,
             'joint_states',
             self.joint_states_callback,
-            10
+            qos_profile
         )
 
         self.declare_parameter('offset_joints', False)

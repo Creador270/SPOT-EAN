@@ -32,15 +32,17 @@ class ControlerSpot(Node):
             qos_profile
         )
 
-        self.lin_vel_x = 0.01
+        self.declare_parameter('fr', 40.0)#Hz
+        frecuency = self.get_parameter('fr').get_parameter_value().double_value
+
+        self.lin_vel_x = 0.0
         self.lin_vel_y = 0.0
         self.ang_vel_z = 0.0
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
-        self.w = 0.0
         self.height_z = 0.0
-        self.stop = 0
+        self.stop = 1
         self.reset = 0
         
         self.joint_names = [
@@ -79,10 +81,10 @@ class ControlerSpot(Node):
         self.load_spot()
 
         # Create timer for routine execution
-        self.create_timer(1/60.0, self.move) # 600Hz
+        self.create_timer(1/frecuency, self.move) 
         
         # self.subscription = self.create_subscription(Imu, 'imu/data', self.imuMagCallback, 10)
-        self.subscription = self.create_subscription(Joy, 'joystick/commands', self.joystickCallback, 10)
+        self.subscription = self.create_subscription(Joy, 'joy', self.joystickCallback, 10)
         self.time = self.get_clock().now().seconds_nanoseconds()[0]
         # print("#########################################################")
         # print(self.time)
@@ -91,36 +93,36 @@ class ControlerSpot(Node):
 
     def load_spot(self):
         # Load Environment
-        self.env = spotBezierEnv(render=False,
-                                 on_rack=False,
-                                 height_field=False,
-                                 draw_foot_path=False)
+        #self.env = spotBezierEnv(render=False,
+        #                         on_rack=False,
+        #                         height_field=False,
+        #                         draw_foot_path=False)
 
-        self.env.reset()
+        #self.env.reset()
 
-        seed = 0
-        # Set seeds
-        self.env.seed(seed)
-        np.random.seed(seed)
+        #seed = 0
+        ## Set seeds
+        #self.env.seed(seed)
+        #np.random.seed(seed)
 
-        state_dim = self.env.observation_space.shape[0]
-        print("STATE DIM: {}".format(state_dim))
-        action_dim = self.env.action_space.shape[0]
-        print("ACTION DIM: {}".format(action_dim))
-        max_action = float(self.env.action_space.high[0])
-        print("RECORDED MAX ACTION: {}".format(max_action))
+        #state_dim = self.env.observation_space.shape[0]
+        #print("STATE DIM: {}".format(state_dim))
+        #action_dim = self.env.action_space.shape[0]
+        #print("ACTION DIM: {}".format(action_dim))
+        #max_action = float(self.env.action_space.high[0])
+        #print("RECORDED MAX ACTION: {}".format(max_action))
 
-        self.state = self.env.reset()
+        #self.state = self.env.reset()
+
+        #self.dt = self.env._time_step
 
         # Load Spot Model
         self.spot = SpotModel()
 
-        self.dt = self.env._time_step
-
         self.T_bf0 = self.spot.WorldToFoot
         self.T_bf = copy.deepcopy(self.T_bf0)
 
-        self.bzg = BezierGait(dt=self.env._time_step)
+        self.bzg = BezierGait()#dt=self.env._time_step)
 
     def quaternion_to_euler(self, x, y, z, w):
         ysqr = y * y
@@ -136,20 +138,31 @@ class ControlerSpot(Node):
         yaw = math.atan2(t3, t4)
         return roll, pitch, yaw
 
-    def joystickCallback(self, msg):
+    def joystickCallback(self, msg): 
+        #print(self.height_z)
         try:
-            self.lin_vel_x = msg.axes[0]
-            self.lin_vel_y = msg.axes[1]
-            self.ang_vel_z = msg.axes[2]
-            self.x = msg.axes[3]
-            self.y = msg.axes[4]
-            self.z = msg.axes[5]
-            self.w = msg.axes[6]
-            self.height_z = msg.axes[7]
-            self.stop = msg.buttons[0]
-            self.reset = msg.buttons[1]
+            self.lin_vel_x = (msg.axes[1]**2) * 0.1
+            if msg.axes[1] < 0:
+                self.lin_vel_x = self.lin_vel_x * -1
+            self.lin_vel_y = (msg.axes[0]**2) * 0.1
+            if msg.axes[0] < 0:
+                self.lin_vel_y = self.lin_vel_y * -1
+
+            if msg.buttons[4]:
+                self.y = np.radians((msg.axes[4] ** 2)/ 0.05)
+                if msg.axes[4] < 0:
+                    self.y = self.y * -1
+                self.x = np.radians((msg.axes[3] ** 2)/ 0.05)
+                if msg.axes[3] < 0:
+                    self.x = self.x * -1
+            else:
+                self.ang_vel_z = msg.axes[3]
+            #self.z = msg.axes[5]
+            self.height_z = (msg.axes[7] * 0.001) + self.height_z
+            self.stop = msg.buttons[1]
+            self.reset = msg.buttons[3]
         except KeyboardInterrupt:
-            pass
+            log.error("can't get data from joystick")
 
     def publish_joints(self, joints_state):
         
@@ -158,7 +171,7 @@ class ControlerSpot(Node):
         msg.header.stamp = self.get_clock().now().to_msg()
 
         if len(joints_state) == len(self.joint_names):
-            print(f'thetas: {joints_state}, {len(joints_state)}')
+            #print(f'thetas: {joints_state}, {len(joints_state)}')
             msg.name = self.joint_names
             msg.position = joints_state.tolist()
         else:
@@ -187,7 +200,7 @@ class ControlerSpot(Node):
             # x offset
             pos = np.array(
                 [0.0, 0.0, self.height_z])
-            orn = np.array(self.quaternion_to_euler(self.x, self.y, self.z, self.w))
+            orn = np.array([self.x, self.y, 0.0])
             # print("#########################################################")
             # print(pos)
             # print("#########################################################")
@@ -201,8 +214,12 @@ class ControlerSpot(Node):
             self.PenetrationDepth = self.BasePenetrationDepth
             self.StepVelocity = self.BaseStepVelocity
             self.SwingPeriod = self.BaseSwingPeriod
+            self.height_z = 0.0
+            self.x = 0.0
+            self.y = 0.0
             pos = np.array([0.0, 0.0, 0.0])
             orn = np.array([0.0, 0.0, 0.0])
+            time.sleep(0.5)
 
         # TODO: integrate into controller
         # self.ClearanceHeight += self.jb.updown * CHPD_SCALE
@@ -222,7 +239,7 @@ class ControlerSpot(Node):
         # print("BASE VEL: {}".format(self.BaseStepVelocity))
         # print("---------------------------------------")
 
-        contacts = self.state[-4:]
+        contacts = [0, 0, 0, 0]
 
         # Time
         dt = self.get_clock().now().seconds_nanoseconds()[0] - self.time
@@ -245,16 +262,16 @@ class ControlerSpot(Node):
 
         joint_angles = self.spot.IK(orn, pos, self.T_bf)
         joint_angles = joint_angles.reshape(-1) * -1
-        self.env.pass_joint_angles(joint_angles)
+        #self.env.pass_joint_angles(joint_angles)
         self.publish_joints(joint_angles)
 
         # Get External Observations
         # TODO
         # self.env.spot.GetExternalObservations(bzg, bz_step)
         # Step
-        action= self.env.action_space.sample()
-        action[:] = 0.0
-        self.state, reward, done, _ = self.env.step(action)
+        #action= self.env.action_space.sample()
+        #action[:] = 0.0
+        #self.state, reward, done, _ = self.env.step(action)
 
 def main(args=None):
     print('Hi from spot_controls.')

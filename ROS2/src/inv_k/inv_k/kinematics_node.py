@@ -61,7 +61,6 @@ class kinematicsNode(Node):
         self.height_increment = 30
 
         # Inicial State
-        self.two_leg_index_map = {(0, 3): [1, 2], (1, 2): [0, 3]}
         self.legIndex = [0, 3]
         self.legState = np.array([1, 1, 1, 1])
         self.legEndpoints=np.array([[60,-60,87.5,1],
@@ -152,18 +151,22 @@ class kinematicsNode(Node):
                     self.legState[:] = 0
                 
             else:
-                if all(self.legState[self.legIndex] == 0):
-                    self.legEndpoints[self.legIndex, 1] += self.height_increment
-                    if self.legEndpoints[self.legIndex, 1].max() >= -60:
-                        self.legState[self.legIndex] = 1
-                else:
-                    self.legEndpoints[self.legIndex, 1] -= self.height_increment
-                    if self.legEndpoints[self.legIndex, 1].min() <= -150:
-                        self.legState[self.legIndex] = 0
-                        self.legIndex = self.two_leg_index_map.get(tuple(self.legIndex))
+                self.stabitily_check()  
         # self.joint_state_msg.position = self.test_actions()
         # self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
         # self.publisher_.publish(self.joint_state_msg)
+
+    def stabitily_check(self):
+        two_leg_index_map = {(0, 3): [1, 2], (1, 2): [0, 3]}
+        if all(self.legState[self.legIndex] == 0):
+            self.legEndpoints[self.legIndex, 1] += self.height_increment
+            if self.legEndpoints[self.legIndex, 1].max() >= -60:
+                self.legState[self.legIndex] = 1
+        else:
+            self.legEndpoints[self.legIndex, 1] -= self.height_increment
+            if self.legEndpoints[self.legIndex, 1].min() <= -150:
+                self.legState[self.legIndex] = 0
+                self.legIndex = two_leg_index_map.get(tuple(self.legIndex))
 
     def euler_to_quaternion(self, roll, pitch, yaw):
         qx = math.sin(roll / 2) * math.cos(pitch / 2) * math.cos(yaw / 2) - math.cos(roll / 2) * math.sin(pitch / 2) * math.sin(yaw / 2)

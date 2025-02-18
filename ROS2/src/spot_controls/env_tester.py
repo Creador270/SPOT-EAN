@@ -166,10 +166,13 @@ def main():
         BR_phases.append(env.spot.LegPhases[3])
 
         # Get Desired Foot Poses
-        T_bf = bzg.GenerateTrajectory(0.05, #StepLength,
-                                      0.0, 0*1.5,# YawRate,
-                                      0.1, T_bf0, T_bf,
-                                      0.04, 0.005,
+        T_bf = bzg.GenerateTrajectory(StepLength,
+                                      LateralFraction,
+                                      YawRate,
+                                      StepVelocity,
+                                      T_bf0, T_bf,
+                                      ClearanceHeight,
+                                      PenetrationDepth,
                                       contacts)
         joint_angles = spot.IK(orn, pos, T_bf)
 
