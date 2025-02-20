@@ -5,7 +5,6 @@ from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node
 
 def generate_launch_description():
 
@@ -78,7 +77,7 @@ def generate_launch_description():
             package='spot_controls',
             executable='movent_node',
             output='screen',
-            #parameters=[{'robot_description': robot_desc}],
+            parameters=[{'fr': 30.0}],
             condition=launch.conditions.UnlessCondition(debug_mode)
             ),
         # Node(

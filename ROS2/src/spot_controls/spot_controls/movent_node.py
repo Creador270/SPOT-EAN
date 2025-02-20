@@ -75,15 +75,15 @@ class ControlerSpot(Node):
         # Contacts: FL, FR, BL, BR
         self.contacts = [0, 0, 0, 0]
 
-        # IMU: R, P, Ax, Ay, Az, Gx, Gy, Gz
-        self.imu = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        # IMU: R, P, Ax, Ay, Az, Gx, Gy, Gz, Qx, Qy, Qz, Qw
+        self.imu = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
         self.load_spot()
 
         # Create timer for routine execution
         self.create_timer(1/frecuency, self.move) 
         
-        # self.subscription = self.create_subscription(Imu, 'imu/data', self.imuMagCallback, 10)
+        self.subscription = self.create_subscription(Imu, 'imu/data', self.imuMagCallback, 10)
         self.subscription = self.create_subscription(Joy, 'joy', self.joystickCallback, 10)
         self.time = self.get_clock().now().seconds_nanoseconds()[0]
         # print("#########################################################")
@@ -164,6 +164,9 @@ class ControlerSpot(Node):
         except KeyboardInterrupt:
             log.error("can't get data from joystick")
 
+    def imuMagCallback(self, msg):
+        self.imu[-3:] = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
+
     def publish_joints(self, joints_state):
         
         msg = JointState()
@@ -201,6 +204,7 @@ class ControlerSpot(Node):
             pos = np.array(
                 [0.0, 0.0, self.height_z])
             orn = np.array([self.x, self.y, 0.0])
+            orn[:2] -= self.quaternion_to_euler(self.imu[-3:])[:2]
             # print("#########################################################")
             # print(pos)
             # print("#########################################################")
@@ -214,11 +218,12 @@ class ControlerSpot(Node):
             self.PenetrationDepth = self.BasePenetrationDepth
             self.StepVelocity = self.BaseStepVelocity
             self.SwingPeriod = self.BaseSwingPeriod
-            self.height_z = 0.0
+            # self.height_z = 0.0
             self.x = 0.0
             self.y = 0.0
             pos = np.array([0.0, 0.0, 0.0])
             orn = np.array([0.0, 0.0, 0.0])
+            orn[:2] -= self.quaternion_to_euler(self.imu[-3:])[:2]
             time.sleep(0.5)
 
         # TODO: integrate into controller
@@ -231,7 +236,7 @@ class ControlerSpot(Node):
             self.PenetrationDepth = self.BasePenetrationDepth
             self.StepVelocity = self.BaseStepVelocity
             self.SwingPeriod = self.BaseSwingPeriod
-            self.env.reset()
+            # self.env.reset()
 
 
         # print("SL: {} \tSV: {} \nLAT: {} \tYAW: {}".format(
