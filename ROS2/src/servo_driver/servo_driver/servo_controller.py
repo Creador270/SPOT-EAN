@@ -74,7 +74,7 @@ class Controllers:
             8: 160,  # back_left DOWN
             9: 60,  # back_left MID
             10: 135, # back_left UP
-            12: 20,  # back_right DOWN
+            12: 8,  # back_right DOWN
             13: 145, # back_right MID
             14: 60   # back_right UP
         }

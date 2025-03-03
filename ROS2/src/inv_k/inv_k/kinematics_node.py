@@ -63,10 +63,10 @@ class kinematicsNode(Node):
         # Inicial State
         self.legIndex = [0, 3]
         self.legState = np.array([1, 1, 1, 1])
-        self.legEndpoints=np.array([[60,-60,87.5,1],
-                                    [60,-60,-87.5,1],
-                                    [-100,-60,87.5,1],
-                                    [-100,-60,-87.5,1]])
+        self.legEndpoints=np.array([[65,-60,87.5,1],
+                                    [65,-60,-87.5,1],
+                                    [-155,-60,87.5,1],
+                                    [-155,-60,-87.5,1]])
         
         # Create timer for routine execution
         self.create_timer(0.1, self.timer_callback)
@@ -83,7 +83,7 @@ class kinematicsNode(Node):
 
         # time.sleep(3)
         
-        # for i in np.arange(-60, -150, -5):
+        # for i in np.arange(-60, -175, -10):
         #     self.legEndpoints[:, 1] = i
         #     self.invk_model.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
         #     self.joint_state_msg.position = list(self.invk_model.thetas.flatten())
@@ -147,7 +147,7 @@ class kinematicsNode(Node):
             #Update the joint_positions of the robot
             if all(self.legState == 1):
                 self.legEndpoints[:, 1] -= 10
-                if self.legEndpoints[:, 1].min() <= -150:
+                if self.legEndpoints[:, 1].min() <= -175:
                     self.legState[:] = 0
                 
             else:

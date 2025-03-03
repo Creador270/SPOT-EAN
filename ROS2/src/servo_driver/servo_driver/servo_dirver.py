@@ -14,7 +14,7 @@ class ServoDriver(Node):
         qos_profile = QoSProfile(
                 reliability=QoSReliabilityPolicy.BEST_EFFORT,
                 durability=QoSDurabilityPolicy.VOLATILE,
-                depth=10
+                depth=1
                 )
         
         self.subscription = self.create_subscription(
@@ -34,7 +34,7 @@ class ServoDriver(Node):
             self.controller.servoRotate(np.zeros((4,3)))
         else:
             self.invKin = Kinematic()
-            self.invKin.drawRobot(np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-100,-60,87.5,1],[-100,-60,-87.5,1]]), (0,0,0), (0,0,0))
+            self.invKin.drawRobot(np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-140,-60,87.5,1],[-140,-60,-87.5,1]]), (0,0,0), (0,0,0))
             self.controller.servoRotate(self.invKin.thetas)
             
 
@@ -75,7 +75,7 @@ class ServoDriver(Node):
 
         if msg.name == list(self._servo_Articulations.keys()):
             self.radians = np.array([self.front_left_leg, self.front_right_leg, self.rear_left_leg, self.rear_right_leg])
-            print(f'front_left_leg: {self.radians[0]}\n front_right_leg: {self.radians[1]}\n rear_left_leg: {self.radians[2]}\n rear_right_leg: {self.radians[3]}\n')
+            # print(f'front_left_leg: {self.radians[0]}\n front_right_leg: {self.radians[1]}\n rear_left_leg: {self.radians[2]}\n rear_right_leg: {self.radians[3]}\n')
             self.controller.servoRotate(self.radians)
         else:
             print('joint states not in correct order')

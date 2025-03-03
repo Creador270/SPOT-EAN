@@ -22,7 +22,7 @@ class ControlerSpot(Node):
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
             history=HistoryPolicy.KEEP_LAST,
-            depth=1
+            depth=10
         )
 
         # Initialize publisher with QoS profile
@@ -80,12 +80,13 @@ class ControlerSpot(Node):
 
         self.load_spot()
 
-        # Create timer for routine execution
-        self.create_timer(1/frecuency, self.move) 
+         
         
         self.subscription = self.create_subscription(Imu, 'imu/data', self.imuMagCallback, 10)
         self.subscription = self.create_subscription(Joy, 'joy', self.joystickCallback, 10)
         self.time = self.get_clock().now().seconds_nanoseconds()[0]
+        ## Create timer for routine execution
+        self.create_timer(1/frecuency, self.move) 
         # print("#########################################################")
         # print(self.time)
         # print("#########################################################")
@@ -158,14 +159,15 @@ class ControlerSpot(Node):
             else:
                 self.ang_vel_z = msg.axes[3]
             #self.z = msg.axes[5]
-            self.height_z = (msg.axes[7] * 0.001) + self.height_z
+            if msg.axes[7] != 0:
+                self.height_z = (msg.axes[7] * 0.001) + self.height_z
             self.stop = msg.buttons[1]
             self.reset = msg.buttons[3]
         except KeyboardInterrupt:
             log.error("can't get data from joystick")
 
     def imuMagCallback(self, msg):
-        self.imu[-3:] = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
+        self.imu[-4:] = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
 
     def publish_joints(self, joints_state):
         
@@ -204,7 +206,7 @@ class ControlerSpot(Node):
             pos = np.array(
                 [0.0, 0.0, self.height_z])
             orn = np.array([self.x, self.y, 0.0])
-            orn[:2] -= self.quaternion_to_euler(self.imu[-3:])[:2]
+            orn[:2] -= self.quaternion_to_euler(self.imu[-4], self.imu[-3], self.imu[-2], self.imu[-1])[:2]
             # print("#########################################################")
             # print(pos)
             # print("#########################################################")
@@ -223,7 +225,7 @@ class ControlerSpot(Node):
             self.y = 0.0
             pos = np.array([0.0, 0.0, 0.0])
             orn = np.array([0.0, 0.0, 0.0])
-            orn[:2] -= self.quaternion_to_euler(self.imu[-3:])[:2]
+            orn[:2] -= self.quaternion_to_euler(self.imu[-4], self.imu[-3], self.imu[-2], self.imu[-1])[:2]
             time.sleep(0.5)
 
         # TODO: integrate into controller
@@ -261,8 +263,10 @@ class ControlerSpot(Node):
                                                 self.PenetrationDepth,
                                                 contacts)
 
-        # for i, (key, Tbf_in) in enumerate(self.T_bf.items()):
-        #     print("{}: \t Angle: {}".format(key, Tbf_in[:3, 3]))
+        for i, (key, Tbf_in) in enumerate(self.T_bf.items()):
+          if key.startswith('B'):
+              Tbf_in[:3, 3][0] = Tbf_in[:3, 3][0] -0.1
+        #     print("{}: \t positions: {}".format(key, Tbf_in[:3, 3]))
         # print("-------------------------")
 
         joint_angles = self.spot.IK(orn, pos, self.T_bf)

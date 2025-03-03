@@ -40,14 +40,6 @@ def generate_launch_description():
             parameters=[{'robot_description': robot_desc}]
         ),
 
-        # Launch servo driver node
-        Node(
-            package='servo_driver',
-            executable='servo_driver_node',
-            output='screen',
-            parameters=[{'offset_joints': debug_mode}]
-        ),
-
         # Launch broadcaster IMU node
         Node(
             package='old_spot_viz',
