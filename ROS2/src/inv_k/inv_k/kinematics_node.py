@@ -69,7 +69,7 @@ class kinematicsNode(Node):
                                     [-155,-60,-87.5,1]])
         
         # Create timer for routine execution
-        self.create_timer(0.1, self.timer_callback)
+        self.create_timer(0.05, self.timer_callback)
 
         time.sleep(2) # Wait to the user can verify the robot
 

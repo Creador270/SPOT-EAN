@@ -43,7 +43,7 @@ def generate_launch_description():
             package='spot_controls',
             executable='movent_node',
             output='screen',
-            parameters=[{'fr': 30.0}],
+            parameters=[{'fr': 60.0}],
             ),
         #joystick Node
         Node(

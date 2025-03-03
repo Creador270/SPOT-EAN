@@ -14,7 +14,7 @@ class ServoDriver(Node):
         qos_profile = QoSProfile(
                 reliability=QoSReliabilityPolicy.BEST_EFFORT,
                 durability=QoSDurabilityPolicy.VOLATILE,
-                depth=1
+                depth=10
                 )
         
         self.subscription = self.create_subscription(
@@ -34,7 +34,11 @@ class ServoDriver(Node):
             self.controller.servoRotate(np.zeros((4,3)))
         else:
             self.invKin = Kinematic()
-            self.invKin.drawRobot(np.array([[60,-60,87.5,1],[60,-60,-87.5,1],[-140,-60,87.5,1],[-140,-60,-87.5,1]]), (0,0,0), (0,0,0))
+            self.legEndpoints=np.array([[65,-60,87.5,1],
+                                    [65,-60,-87.5,1],
+                                    [-155,-60,87.5,1],
+                                    [-155,-60,-87.5,1]])
+            self.invKin.drawRobot(self.legEndpoints, (0,0,0), (0,0,0))
             self.controller.servoRotate(self.invKin.thetas)
             
 

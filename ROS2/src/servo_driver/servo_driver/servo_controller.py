@@ -28,7 +28,7 @@ class Controllers:
 
     __init__: Initializes two ServoKit instances for controlling the servos, 
     sets the servo offsets (which are used to adjust the zero position of each servo),
-    and initializes some other variables.
+and initializes some other variables.
 
     getDegreeAngles: Converts the joint angles from radians to degrees.
 
@@ -67,10 +67,10 @@ class Controllers:
         self._servo_offsets = {
             0: 170,  # front_left DOWN
             1: 60,  # front_left MID
-            2: 60,   # front_left UP
+            2: 62,   # front_left UP
             4: 10,   # front_right DOWN
             5: 150,  # front_right MID
-            6: 150,  # front_right UP
+            6: 148,  # front_right UP
             8: 160,  # back_left DOWN
             9: 60,  # back_left MID
             10: 135, # back_left UP

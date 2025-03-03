@@ -220,7 +220,7 @@ class ControlerSpot(Node):
             self.PenetrationDepth = self.BasePenetrationDepth
             self.StepVelocity = self.BaseStepVelocity
             self.SwingPeriod = self.BaseSwingPeriod
-            # self.height_z = 0.0
+            self.height_z = 0.0
             self.x = 0.0
             self.y = 0.0
             pos = np.array([0.0, 0.0, 0.0])
@@ -266,7 +266,9 @@ class ControlerSpot(Node):
         for i, (key, Tbf_in) in enumerate(self.T_bf.items()):
           if key.startswith('B'):
               Tbf_in[:3, 3][0] = Tbf_in[:3, 3][0] -0.1
-        #     print("{}: \t positions: {}".format(key, Tbf_in[:3, 3]))
+          if key.startswith('F'):
+              Tbf_in[:3, 3][0] = Tbf_in[:3, 3][0] +0.03
+        #   print("{}: \t positions: {}".format(key, Tbf_in[:3, 3]))
         # print("-------------------------")
 
         joint_angles = self.spot.IK(orn, pos, self.T_bf)
