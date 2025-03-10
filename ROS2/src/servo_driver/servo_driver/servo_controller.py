@@ -66,17 +66,17 @@ and initializes some other variables.
         #default positions to go back to
         self._servo_offsets = {
             0: 170,  # front_left DOWN
-            1: 60,  # front_left MID
+            1: 74,  # front_left MID
             2: 62,   # front_left UP
             4: 10,   # front_right DOWN
             5: 150,  # front_right MID
-            6: 148,  # front_right UP
+            6: 147,  # front_right UP
             8: 160,  # back_left DOWN
             9: 60,  # back_left MID
             10: 135, # back_left UP
-            12: 8,  # back_right DOWN
+            12: 5,  # back_right DOWN
             13: 145, # back_right MID
-            14: 60   # back_right UP
+            14: 63   # back_right UP
         }
         
         # self._servo_offsets = {k: 90 for k in range(16)}
