@@ -161,6 +161,8 @@ class ControlerSpot(Node):
             #self.z = msg.axes[5]
             if msg.axes[7] != 0:
                 self.height_z = (msg.axes[7] * 0.001) + self.height_z
+            if msg.axes[6] != 0:
+                self.ClearanceHeight = (self.ClearanceHeight * 0.001) + self.ClearanceHeight
             self.stop = msg.buttons[1]
             self.reset = msg.buttons[3]
         except KeyboardInterrupt:

@@ -151,20 +151,27 @@ class kinematicsNode(Node):
                     self.legState[:] = 0
                 
             else:
-                self.stabitily_check()  
+                self.stabitily_check() 
         # self.joint_state_msg.position = self.test_actions()
         # self.joint_state_msg.header.stamp = self.get_clock().now().to_msg()
         # self.publisher_.publish(self.joint_state_msg)
+
+    def sit_down(self):
+        #Update the joint_positions of the robot
+            if all(self.legState == 0):
+                self.legEndpoints[:, 1] += 10 
+                if self.legEndpoints[:, 1].max() >= -60:
+                    self.legState[:] = 1
 
     def stabitily_check(self):
         two_leg_index_map = {(0, 3): [1, 2], (1, 2): [0, 3]}
         if all(self.legState[self.legIndex] == 0):
             self.legEndpoints[self.legIndex, 1] += self.height_increment
-            if self.legEndpoints[self.legIndex, 1].max() >= -60:
+            if self.legEndpoints[self.legIndex, 1].max() >= -120:
                 self.legState[self.legIndex] = 1
         else:
             self.legEndpoints[self.legIndex, 1] -= self.height_increment
-            if self.legEndpoints[self.legIndex, 1].min() <= -150:
+            if self.legEndpoints[self.legIndex, 1].min() <= -175:
                 self.legState[self.legIndex] = 0
                 self.legIndex = two_leg_index_map.get(tuple(self.legIndex))
 
