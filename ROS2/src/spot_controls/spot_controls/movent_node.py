@@ -67,7 +67,7 @@ class ControlerSpot(Node):
         self.BaseSwingPeriod = 0.2
         self.SwingPeriod = self.BaseSwingPeriod
         # Stock, use arrow pads to change
-        self.BaseClearanceHeight = 0.04
+        self.BaseClearanceHeight = 0.0
         self.BasePenetrationDepth = 0.005
         self.ClearanceHeight = self.BaseClearanceHeight
         self.PenetrationDepth = self.BasePenetrationDepth
@@ -142,27 +142,41 @@ class ControlerSpot(Node):
     def joystickCallback(self, msg): 
         #print(self.height_z)
         try:
-            self.lin_vel_x = (msg.axes[1]**2) * 0.1
-            if msg.axes[1] < 0:
-                self.lin_vel_x = self.lin_vel_x * -1
-            self.lin_vel_y = (msg.axes[0]**2) * 0.1
-            if msg.axes[0] < 0:
-                self.lin_vel_y = self.lin_vel_y * -1
-
             if msg.buttons[4]:
+                #Control yaw, pitch and roll 
                 self.y = np.radians((msg.axes[4] ** 2)/ 0.05)
                 if msg.axes[4] < 0:
                     self.y = self.y * -1
                 self.x = np.radians((msg.axes[3] ** 2)/ 0.05)
                 if msg.axes[3] < 0:
                     self.x = self.x * -1
+                self.z = np.radians((msg.axes[0] ** 2)/ 0.05)
+                if msg.axes[0] < 0:
+                    self.z = self.z * -1
             else:
-                self.ang_vel_z = msg.axes[3]
-            #self.z = msg.axes[5]
+                #Angular velocity in z
+                self.ang_vel_z = msg.axes[3] * 2
+                
+                #Linear velocity in x and y
+                self.lin_vel_y = (msg.axes[0]**2) * 0.06
+                if msg.axes[0] < 0:
+                    self.lin_vel_y = self.lin_vel_y * -1
+                self.lin_vel_x = (msg.axes[1]**2) * 0.06
+                if msg.axes[1] < 0:
+                    self.lin_vel_x = self.lin_vel_x * -1
+            
+            #Iperparameters
             if msg.axes[7] != 0:
-                self.height_z = (msg.axes[7] * 0.001) + self.height_z
+                self.PenetrationDepth = (msg.axes[7] * 0.001) + self.PenetrationDepth
             if msg.axes[6] != 0:
-                self.ClearanceHeight = (self.ClearanceHeight * 0.001) + self.ClearanceHeight
+                self.ClearanceHeight = (msg.axes[6] * 0.001) + self.ClearanceHeight
+
+            #buttons
+            # Press X to control the height
+            if msg.buttons[2]:
+                self.height_z = -(msg.axes[2] * 0.05) +0.05
+
+            #Reset Robot
             self.stop = msg.buttons[1]
             self.reset = msg.buttons[3]
         except KeyboardInterrupt:
@@ -207,7 +221,7 @@ class ControlerSpot(Node):
             # x offset
             pos = np.array(
                 [0.0, 0.0, self.height_z])
-            orn = np.array([self.x, self.y, 0.0])
+            orn = np.array([self.x, self.y, self.z])
             orn[:2] -= self.quaternion_to_euler(self.imu[-4], self.imu[-3], self.imu[-2], self.imu[-1])[:2]
             # print("#########################################################")
             # print(pos)
@@ -225,6 +239,7 @@ class ControlerSpot(Node):
             self.height_z = 0.0
             self.x = 0.0
             self.y = 0.0
+            self.z = 0.0
             pos = np.array([0.0, 0.0, 0.0])
             orn = np.array([0.0, 0.0, 0.0])
             orn[:2] -= self.quaternion_to_euler(self.imu[-4], self.imu[-3], self.imu[-2], self.imu[-1])[:2]
