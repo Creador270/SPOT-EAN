@@ -32,7 +32,7 @@
     </collision>
     <inertial>
       <mass value="0.94447"/>
-      <inertia ixx="0.00387805268" ixy="-0.00003434884" ixz="-0.000016961.6" iyy="0.00109473849" iyz="0.00031562911" izz="0.00409615181"/>
+      <inertia ixx="0.00387805268" ixy="-0.00003434884" ixz="-0.0000169616" iyy="0.00109473849" iyz="0.00031562911" izz="0.00409615181"/>
     </inertial>
   </link>
   <link name="rear_link">
@@ -117,7 +117,7 @@
     </collision>
     <inertial>
       <mass value="0.1942"/>
-      <inertia ixx="0.00020999903" ixy="0.00033247456" ixz="0.0002163401" iyy="0.00136287772" iyz="0.00006388282" izz="0.00146174584"/>
+      <inertia ixx="0.00010075846" ixy="0.00001174271" ixz="0.00002227477" iyy="0.00028245225" iyz="-0.00000610061" izz="0.00027215429"/>
     </inertial>
   </link>
   <link name="front_left_foot_link">
@@ -329,7 +329,7 @@
     </collision>
     <inertial>
       <mass value="0.1942"/>
-      <inertia ixx="0.00020999903" ixy="0.00033247456" ixz="0.0002163401" iyy="0.00136287772" iyz="0.00006388282" izz="0.00146174584"/>
+      <inertia ixx="0.00010075846" ixy="0.00001174271" ixz="0.00002227477" iyy="0.00028245225" iyz="-0.00000610061" izz="0.00027215429"/>
     </inertial>
   </link>
   <link name="rear_left_foot_link">
